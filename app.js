@@ -84,6 +84,36 @@ app.patch("/todos/:id", async (req, res) => {
   });
 });
 
+app.delete("/todos/:id", async (req, res) => {
+  const { id } = req.params;
+
+  const [[todoRow]] = await pool.query(
+    `
+    SELECT *
+    FROM todo
+    WHERE id = ?`,
+    [id]
+  );
+
+  if (todoRow === undefined) {
+    res.status(404).json({
+      msg: " not found",
+    });
+
+    return;
+  }
+
+  const [rs] = await pool.query(
+    `DELETE FROM todo
+    WHERE id = ?`,
+    [id]
+  );
+
+  res.json({
+    msg: `${id}번 할일이 삭제되었습니다.`,
+  });
+});
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
